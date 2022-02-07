@@ -9,14 +9,6 @@ const User = require("../models/user");
 const Account = require("../models/account");
 const Seller = require("../models/seller");
 
-const transporter = nodemailer.createTransport(
-  sendgridTransport({
-    auth: {
-      api_key: process.env.SENDGRID_KEY,
-    },
-  })
-);
-
 exports.signupUser = (req, res, next) => {
   const errors = validationResult(req);
 
@@ -64,22 +56,7 @@ exports.signupUser = (req, res, next) => {
       });
       return user.save();
     })
-    .then((savedUser) => {
-      transporter.sendMail({
-        to: email,
-        from: "YOUR_SENDGRID_VERIFIED_EMAIL",
-        subject: "Verify your Account on FoodHub",
-        html: `
-                      <p>Please verify your email by clicking on the link below - FoodHub</p>
-                      <p>Click this <a href="http://localhost:3002/auth/verify/${token}">link</a> to verify your account.</p>
-                    `,
-      });
-      res.status(201).json({
-        message:
-          "User signed-up successfully, please verify your email before logging in.",
-        userId: savedUser._id,
-      });
-    })
+    
     .catch((err) => {
       if (!err.statusCode) err.statusCode = 500;
       next(err);
@@ -135,13 +112,7 @@ exports.login = (req, res, next) => {
         error.statusCode = 401;
         throw error;
       }
-      if (loadedUser.isVerified === false) {
-        const error = new Error(
-          "Verify your email before accessing the platform."
-        );
-        error.statusCode = 401;
-        throw error;
-      }
+     
       const token = jwt.sign(
         { accountId: loadedUser._id.toString() },
         "supersecretkey-foodWebApp",
@@ -157,7 +128,7 @@ exports.login = (req, res, next) => {
 
 exports.signupSeller = (req, res, next) => {
   const errors = validationResult(req);
-
+  console.log("Running");
   if (!errors.isEmpty()) {
     const error = new Error("Validation Failed, Incorrect data entered.");
     error.statusCode = 422;
@@ -170,7 +141,7 @@ exports.signupSeller = (req, res, next) => {
     error.statusCode = 422;
     throw error;
   }
-
+  console.log("Running");
   const arrayFiles = req.files.map((file) => file.path);
   const email = req.body.email;
   const name = req.body.name;
@@ -215,6 +186,8 @@ exports.signupSeller = (req, res, next) => {
       return account.save();
     })
     .then((savedAccount) => {
+      console.log(formattedAddress)
+      console.log(savedAccount);
       const seller = new Seller({
         name: name,
         tags: tags,
@@ -236,22 +209,7 @@ exports.signupSeller = (req, res, next) => {
       });
       return seller.save();
     })
-    .then((savedSeller) => {
-      transporter.sendMail({
-        to: email,
-        from: "YOUR_SENDGRID_VERIFIED_EMAIL",
-        subject: "Verify your Account on FoodHub",
-        html: `
-                      <p>Please verify your email by clicking on the link below - FoodHub</p>
-                      <p>Click this <a href="http://localhost:3002/auth/verify/${token}">link</a> to verify your account.</p>
-                    `,
-      });
-      res.status(201).json({
-        message:
-          "Seller signed-up successfully, please verify your email before logging in.",
-        sellerId: savedSeller._id,
-      });
-    })
+  
     .catch((err) => {
       if (!err.statusCode) err.statusCode = 500;
       next(err);

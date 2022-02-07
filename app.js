@@ -73,7 +73,7 @@ const clients = {};
 
 mongoose
   .connect(
-    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-fvjx9.mongodb.net/${process.env.MONGO_DATABASE}?authSource=admin&replicaSet=Cluster0-shard-0&readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=true`
+    "mongodb+srv://Madhur23579:7982746691@cluster0.g7rks.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", { useNewUrlParser: true ,useUnifiedTopology: true }
   )
   .then((result) => {
     console.log("Connected to db");
@@ -100,3 +100,5 @@ mongoose
   .catch((err) => console.log(err));
 
 exports.clients = clients;
+
+// `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-fvjx9.mongodb.net/${process.env.MONGO_DATABASE}?authSource=admin&replicaSet=Cluster0-shard-0&readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=true`
